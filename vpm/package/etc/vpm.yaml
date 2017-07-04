@@ -1,0 +1,32 @@
+%YAML 1.1
+---
+id: 1
+log: 
+  level: info
+  mask: 0
+vrsweb: 
+  ip: 192.168.40.21
+  port: 2020
+ 
+
+# $mergecfg.样本合并的配置
+# 'A', 设置样本交叉匹配平均分大于X分值的个数
+# 'X', 设置样本交叉匹配平均分样本质量较好的分值
+# 'Z', 设置交叉匹配平均分质量差的分值
+# 'magic', less FAR比系统推荐值(default)大于的分数
+mergecfg:
+  min-num: 3
+  merge-score: 55
+  bad-score: 30
+  not-merge-bad-score: 30
+
+vpudata-path: /home/vpu_data1 
+
+bf-threshold: 70
+
+casedb:
+  dbname: 192.168.60.221/orcl
+  user: sysman
+  passwd: Semptian1q2w3e
+ 
+...

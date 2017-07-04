@@ -1,0 +1,10 @@
+%YAML 1.1
+---
+APP2_template:
+  version: 2.00.000
+  config-path: /usr/local/etc/manager-agent/
+  executives:
+  - exec:
+    cmd: ma
+    status: daemon,keepalive
+...

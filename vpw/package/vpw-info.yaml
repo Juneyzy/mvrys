@@ -1,0 +1,11 @@
+%YAML 1.1
+---
+vpw:
+  version: 4.03.BUILDSTR
+  config-path: /usr/local/etc/vpw/
+  set-config-path: 0
+  executives:
+  - exec:
+    cmd: vpw
+    status: daemon,keepalive
+...

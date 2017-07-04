@@ -1,0 +1,44 @@
+%YAML 1.1
+---
+
+wave-path: /vrs/fileupload
+mass-path: /vrs/fullmatch
+comp-path: /vrs/crossmatch
+dst-path:  /vrs/modupload
+vdu-path:  /vrs/vdu_model
+
+vdu:
+- id: 1
+  ip: 192.168.40.42
+  port: 2033
+- id: 2
+  ip: 192.168.40.36
+  port: 2033
+
+vpm:
+- id: 1
+  ip: 192.168.40.222
+  port: 2050
+
+vpw:
+- id: 1
+  dev: p3p2
+  mac: 00-0a-f7-20-9a-85
+- id: 2
+  dev: p3p2
+  mac: 00-0a-f7-20-9a-85
+- id: 3
+  dev: p3p2
+  mac: 00-0a-f7-20-9a-85
+
+groups:
+- id: 1
+  vdu: 1
+  vpm: 1
+  vpw: 1 2 3
+- id: 2
+  vdu: 2
+  vpm: 1
+  vpw: 5 6 7 8
+
+...

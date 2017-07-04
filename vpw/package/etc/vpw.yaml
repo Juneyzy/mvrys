@@ -1,0 +1,18 @@
+%YAML 1.1
+---
+id: 1
+
+up-score: 80
+mul-filt-enable: 0
+stage-time: 30 90 180
+short-voice-enable: 1
+
+cdr:
+  ip: 192.168.27.103
+  port: 2015
+
+log:
+    level: info
+    mask: 0
+
+...

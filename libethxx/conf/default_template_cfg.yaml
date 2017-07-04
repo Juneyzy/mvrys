@@ -1,0 +1,90 @@
+%YAML 1.1
+---
+
+# Type [in (master|slave)] configure for current decoder.
+local-decoder-type: master
+
+metadata:
+  inotify-interval: 5
+  path: /var/data    
+  server-user: oracle
+  server-ip: 192.168.40.210
+  script-path: script/py
+
+capture:
+
+  # Capture eth device
+  netdev: wlp3s0
+
+  # filter: vrs, normal
+  filter: normal
+
+  # How many packets can be cached in memory  
+  packet-caches: 4096
+  
+  # The length per cache (the maximum of packet from netdev)
+  packet-cache-size: 2048
+  
+  # In seconds, unused
+  report-interval: 3
+  
+  # Packet options control what should do while getting a packet from netdev.
+  # A_UNDO: without displaying and storing;  
+  # A_WRONLY: store only; 
+  # A_RDONLY: display only;
+  # A_RDWR: displaying and storing pacekts;
+  packet-option: A_UNDO
+
+  # The place where packets stored
+  warehouse: ./warehouse
+
+interface:
+  ui:
+    - ipaddress: 192.168.40.21
+    - port: 2001
+  ma:
+    - conf-path: /usr/local/etc/dms.yaml
+  rpc:
+    - key: undefined
+
+logging:
+  default-log-dir: ./logs
+  default-log-format: "[%i] %t - (%f:%l) <%d> (%n) -- "
+  # Log level, little case, vlaue in: EMERG,ALERT,CRIT,ERR,WARNING,NOTICE,INFO,DEBUG
+  default-log-level: debug
+  # Define your logging outputs.  If none are defined, or they are all
+  # disabled you will get the default - console output.
+  outputs:
+  - console:
+      enable: yes
+  - file:
+      enable: yes
+      filename: xruntime_log
+  - syslog:
+      enable: no
+      facility: local5
+      format: "[%i] <%d> -- "
+
+local-probe-cluster:
+  keepalive-interval: 3
+  link-detection-interval: 3
+  cluster:
+    - host: 192.168.40.21/24
+      port: 33334 
+    - host: 192.168.40.21/24
+      port: 33335
+    - host: 192.168.40.21/24
+      port: 33336
+
+local-decoder-cluster:
+  # reconnect interval
+  keepalive-interval: 3
+  link-detection-interval: 3
+
+#  Remote master and local listen port.
+local-decoder:
+  keep-alive: 5
+  host: 192.168.40.20/24
+  local-port: 44444
+
+...

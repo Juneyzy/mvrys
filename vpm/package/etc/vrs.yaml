@@ -1,0 +1,67 @@
+%YAML 1.1
+---
+wave-path: /vrs/fileupload
+mass-path: /vrs/fullmatch
+comp-path: /vrs/crossmatch
+dst-path: /vrs/modupload
+vdu-path: /vrs/vdu_model
+target-path: /vrs/targetmatch
+
+boost-sw: 1
+
+topn-alg:
+  switch: 1
+  update-threshold: 55
+  hit-threshold: 30 
+  dir: /usr/local/etc/topn
+  topn-max: 10
+  topn-min: 3
+reserved: 
+  reserved1: 1
+  reserved2: 100
+  reserved3: 
+  reserved4: 
+  reserved5: 
+  reserved6: 
+  reserved7: 
+  reserved8: 
+  reserved9: 
+  reserved10: 
+
+threshold: 
+  default-min: 35
+  default-max: 52
+  explore-min: 30
+  explore-max: 47
+  accurate-magic: 10
+  explore-magic: 5
+
+vpm: 
+- id: 1
+  ip: 192.168.40.222
+  port: 2050
+vdu: 
+- id: 1
+  ip: 192.168.40.223
+  port: 2033
+- id: 2
+  ip: 192.168.40.232
+  port: 2033
+groups: 
+- id: 1
+  vdu: 1
+  vpm: 1
+  vpw: 1 
+- id: 2
+  vdu: 2
+  vpm: 1
+  vpw: 2 
+vpw: 
+- id: 1
+  dev: p3p2
+  mac: 00-0a-f7-20-9a-85
+- id: 2
+  dev: em2
+  mac: 74-86-7a-db-b5-2e
+ 
+...

@@ -1,0 +1,6 @@
+%YAML 1.1
+---
+applications:
+- app-template: 1
+  app1-template: 2
+...

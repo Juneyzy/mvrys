@@ -1,0 +1,27 @@
+libethxx.a库
+1. 库文件路径: vrs/lib/libethxx.a
+2. 依赖库文件程序：VPM、VPW
+更新libethxx.a库
+1. cd /vrs
+2. make libeth
+操作说明：
+自动生成libethxx.a库，并更新vrs/lib/libethxx.a文件。
+
+vpm编译：
+1. cd /vrs/vpm
+2. make 
+
+vpm安装包：
+1. cd /vrs/vpm
+2. make tarball
+生成安装包路径：vrs/release/vpm-4.00.112.tar.gz
+
+
+vpw编译：
+1. cd /vrs/vpw
+2. make 
+
+vpw安装包：
+1. cd /vrs/vpw
+2. make tarball
+生成安装包路径：vrs/release/vpw-4.00.112.tar.gz

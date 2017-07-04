@@ -1,0 +1,384 @@
+#!/usr/bin/env python
+#########################################################################
+# File Name: demo.py
+# Author: xhp
+# mail: xiehuipeng@semptian.com
+# Created Time: 2015-12-02
+# Description: this script run as root on server
+#########################################################################
+# -*-coding:utf-8-*-
+import os, sys, time
+import socket
+import atexit
+import signal
+import threading, time
+#from oradbClass import OraDB
+import cx_Oracle
+
+#debug
+#import pdb
+
+class Deamo(object):
+    def __init__(self, pidfile = "/var/run/oradeamon.pid", stdin=os.devnull, 
+                 stdo= "/var/log/oradeamon.log", stde="/var/log/oradeamon.log",umask=022):
+        self.pidfile = pidfile
+        self.stdin = stdin
+        self.stdout = stdo
+        self.stderr = stde
+        self.umask = umask
+        
+        self.alive = True
+        
+    def daemonize(self):
+        try:
+            pid = os.fork()
+            if pid > 0:
+                sys.exit(0)
+        except OSError as e:
+            sys.stderr.write("fork faild:{0:d} {1:s}".format(e.errno, e.strerror))
+            sys.exit(1)
+        
+        os.chdir("/")
+        os.setsid()
+        os.umask(self.umask)
+        
+        sys.stdout.flush()
+        sys.stderr.flush()
+        si = open(self.stdin, 'r') 
+        so = open(self.stdout, 'a+', 0) 
+        if self.stderr: 
+            se = open(self.stderr, 'a+', 0) 
+        else: 
+            se = so 
+        
+        os.dup2(si.fileno(), sys.stdin.fileno()) 
+        os.dup2(so.fileno(), sys.stdout.fileno()) 
+        os.dup2(se.fileno(), sys.stderr.fileno())  
+        atexit.register(self.delpid)
+        open(self.pidfile, "w+").write("{0:s}\r\n".format(str(os.getpid())))
+        
+    def delpid(self):
+        os.remove(self.pidfile)
+        
+    def get_pid(self):
+        try:
+            fp = open(self.pidfile, "r")
+            pid = int(fp.readline().strip())
+        except:
+            pid = None
+        return pid
+    
+    def is_running(self):
+        pid = self.get_pid()
+        return pid and os.path.exists("/proc/{0:d}".format(pid))
+        
+        
+    def start_serv(self, *tup, **key_val):
+        print "Starting ..."
+        if os.path.exists(self.pidfile):
+            sys.stderr.write("pidfile {0:s} already exist, so process is runing\r\n".format(self.pidfile))
+            #self.detach()
+            sys.exit(1)
+        
+        self.daemonize()
+        self.run(*tup, **key_val)      
+          
+    def stop_serv(self):
+        print "Stoping ..."
+        pid = self.get_pid()            
+        if not pid:
+            sys.stderr.write("pidfile {0:s} does not exists\r\n".format(self.pidfile))
+            
+            if os.path.exists(self.pidfile): 
+                os.remove(self.pidfile)
+            return
+     
+        try:
+            i = 0
+            while True:
+                pass
+                os.kill(pid, signal.SIGTERM)
+                i+=1
+                time.sleep(0.1)
+                if i % 10 == 0:
+                    os.kill(pid, signal.SIGHUP)
+        except OSError as e:
+            
+            err = str(e)
+            if err.find("No such process"):
+                if os.path.exists(self.pidfile):
+                    os.remove(self.pidfile)
+            else:
+                print err
+                sys.exit(1)     
+            print "Stoped ..."
+        
+    
+    def restart_serv(self):
+        self.stop_serv()
+        self.start_serv()
+
+    def run(*tup, **key_val):
+        """ subclass should override this method"""
+        
+    def detach(self):
+        """subclass override"""
+        
+        
+create_http_table = ''' create table http_lib_table (
+                        capture_time number,
+                        src_ip varchar2(40),
+                        src_port number(5) check(src_port >= 0 and src_port <= 65535),
+                        dest_ip varchar2(40),
+                        dest_port number(5) check(dest_port >= 0 and dest_port <= 65535),
+                        src_account varchar2(256),
+                        dest_account varchar2(256),
+                        type varchar2(32),
+                        url varchar2(1024),
+                        payload_size number,
+                        details varchar2(2048) unique)
+
+'''
+
+create_email_table = '''create table email_lib_table (
+                        capture_time number,
+                        src_ip varchar2(40),
+                        src_port number(5) check(src_port >= 0 and src_port <= 65535),
+                        dest_ip varchar2(40),
+                        dest_port number(5) check(dest_port >= 0 and dest_port <= 65535),
+                        src_account varchar2(256),
+                        dest_account varchar2(256),
+                        type varchar2(32),
+                        mail_from varchar2(1024),
+                        mail_to varchar2(1024),
+                        subject varchar2(1024),
+                        user_name varchar2(256),
+                        passwd varchar2(256),
+                        details varchar2(2048) unique)
+'''
+
+create_tftp_table = '''create table tftp_lib_table (
+                        capture_time number,
+                        src_ip varchar2(40),
+                        src_port number(5) check(src_port >= 0 and src_port <= 65535),
+                        dest_ip varchar2(40),
+                        dest_port number(5) check(dest_port >= 0 and dest_port <= 65535),
+                        src_account varchar2(256),
+                        dest_account varchar2(256),
+                        user_name varchar2(256),
+                        passwd varchar2(256),
+                        ftp_cmd varchar2(256),
+                        ftp_filename varchar2(256) unique)
+'''
+
+create_im_table = '''create table im_lib_table (
+                        capture_time number,
+                        src_ip varchar2(40),
+                        src_port number(5) check(src_port >= 0 and src_port <= 65535),
+                        dest_ip varchar2(40),
+                        dest_port number(5) check(dest_port >= 0 and dest_port <= 65535),
+                        src_account varchar2(256),
+                        dest_account varchar2(256),
+                        send_id number,
+                        receive_id number,
+                        login_id number,
+                        group_id number,
+                        im_type varchar2(32),
+                        action_type varchar2(32),
+                        chat_content varchar2(2048))
+'''
+
+class OraDB(object):
+    usrname = ""
+    pwd = ""
+    oracle_host = ""
+
+    __oracle_conn = None
+    __oracle_cursor = None
+    __commit_flag = 0
+
+    def __init__(self, usrname='secnet', pwd='secnet', oracle_host='192.168.40.210/ora11g'): 
+        self.usrname = usrname
+        self.pwd = pwd
+        self.oracle_host = oracle_host
+        self.__commit_flag = 0
+        self.__commit_mutex = threading.Lock()
+
+    def oracle_open(self):
+        "connect db and return con-obj"
+        self.__oracle_conn = cx_Oracle.connect(self.usrname, self.pwd, self.oracle_host)
+        self.__oracle_cursor = self.__oracle_conn.cursor()
+        th = threading.Thread(target=OraDB.timer_commit, args=(self,))
+        #th = threading.Timer(30, OraDB.timer_commit, [self])
+        th.setDaemon(True)
+        th.start()
+
+    def insert_table_fullval(self, table_name, val):
+        "opened db, table name & tuple value "
+     
+        self.__oracle_cursor.execute("insert into %s values %s"%(table_name, str(val)))
+        self.__commit_mutex.acquire()
+        self.__commit_flag += 1
+        self.__commit_mutex.release()
+            
+    def insert_execute(self, sql_insert):
+        #sys.stderr.write(sql_insert)
+        
+        self.__commit_mutex.acquire()
+        try:
+            self.__oracle_cursor.execute(sql_insert)
+            self.__commit_flag += 1
+            self.auto_commit()
+        finally:
+            self.__commit_mutex.release()
+
+    def oracle_commit(self):
+        if self.__commit_flag != 0:
+            self.__oracle_conn.commit()
+            self.__commit_flag = 0
+            
+    def auto_commit(self):
+        if self.__commit_flag > 1000:
+            self.oracle_commit()
+            
+    def timer_commit(self, sec = 30):
+        """
+        self.__commit_mutex.acquire()
+        try:
+            self.oracle_commit()
+        finally:
+            self.__commit_mutex.release()
+        
+        th = threading.Timer(30, OraDB.timer_commit, [self])
+        th.setDaemon(True)
+        th.start()
+        """
+        flag = True
+        #def getsingterm(signal, frame):
+        #    flag = False
+        #signal.signal(signal.SIGTERM, getsingterm)  #signal only works in main thread
+        while flag:
+            time.sleep(sec)
+            self.__commit_mutex.acquire()
+            try:
+                self.oracle_commit()
+            finally:
+                self.__commit_mutex.release()            
+        
+    def show_all_table(self, table_name):
+        self.__oracle_cursor.execute("select * from %s"%(table_name))
+        return slef.__oracle_cursor.fetchall()
+
+    def create_all_table(self):
+        "cursor execute sql"
+        self.__oracle_cursor.execute(create_http_table)
+        self.__oracle_cursor.execute(create_email_table)
+        self.__oracle_cursor.execute(create_tftp_table)
+        self.__oracle_cursor.execute(create_im_table)
+
+
+    def oracle_close(self):
+        self.__commit_mutex.acquire()
+        self.oracle_commit()
+        self.__commit_mutex.release()
+        self.__oracle_cursor.close()
+        self.__oracle_conn.close()
+
+
+class Syncora(Deamo, OraDB):
+    def __init__(self):
+        Deamo.__init__(self)
+        OraDB.__init__(self)
+    
+    def start(self, *tup, **key_val):
+        def sigtermhandler(signal, frame):
+            try:
+                self.oracle_close()
+                self.server.close()
+            except AttributeError as e:
+                sys.stderr.write(str(e.message))
+                
+        signal.signal(signal.SIGTERM, sigtermhandler)
+        self.start_serv(*tup, **key_val)
+        
+        
+    
+    def stop(self): 
+        self.stop_serv()
+          
+    def restart(self):
+        self.stop()
+        self.start()
+                  
+    def deal_thread(self, connect, keep=False):
+        keep=True
+        while True: 
+            """
+            buf = []
+            while True:
+                recv_msg = connect.recv(2048)
+                if len(recv_msg) != 0:
+                    buf.append(recv_msg)
+                    sys.stdout.write("{0} times, {1}\r\n".format(len(buf), recv_msg))
+                else:
+                    break
+            sql = "".join(buf)
+            """
+            sql = connect.recv(2048)
+            recv_len = len(sql)
+            if recv_len:
+                try:
+                    self.insert_execute(sql) 
+                except cx_Oracle.DatabaseError as e:
+                    err = str(e)
+                    if err.find("SQL command not proprely ended"):
+                        sys.stderr.write("SQL command not proprely ended, sql len = {0}\r\n".format(len(sql)))
+                    else:
+                        sys.stderr.write("execute sql error\r\n")
+                        
+                connect.send(str(recv_len))
+            else:
+                #sys.stderr.write("recv 0 msg,\r\n")# {0} will quit\r\n".format(thread))
+                break
+            if keep == False:
+                break
+        connect.close()
+            
+    def run(self, *tup, **key_val):
+        self.oracle_open()
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        
+        host = "192.168.40.210"
+        port = 44556
+        self.server.bind((host, port))
+        self.server.listen(20)
+        
+        while True:
+            try :
+                accept_fd, cli_addr = self.server.accept()
+            except Exception as e:
+                break
+            if accept_fd > 0:
+                new_thread = threading.Thread(target=Syncora.deal_thread, args=(self, accept_fd))
+                new_thread.setDaemon(True)
+                new_thread.start()
+                #new_thread.join(1)
+                
+         
+
+if __name__ == "__main__":
+    
+    obj = Syncora()
+    if len(sys.argv) == 2:
+        if sys.argv[1] == "stop":
+            obj.stop()
+            sys.exit(0)
+        elif sys.argv[1] == "restart":
+            obj.restart()
+            sys.exit(0)
+        
+    obj.start()
+           
+    
+    

@@ -1,0 +1,10 @@
+[21648] 16/8/2016 -- 18:00:13 - (apputils.c:23) <Debug> (apputils_decode_idx) -- 19644 21648 21648 19644 pts/1    21648 S+    1000   0:00 ./sguard
+
+[21648] 16/8/2016 -- 18:00:13 - (apputils.c:23) <Debug> (apputils_decode_idx) -- 21648 21651 21648 19644 pts/1    21648 S+    1000   0:00 sh -c ps axj | grep "sguard"
+
+[21648] 16/8/2016 -- 18:00:13 - (apputils.c:23) <Debug> (apputils_decode_idx) -- 21651 21653 21648 19644 pts/1    21648 S+    1000   0:00 grep sguard
+
+[21791] 16/8/2016 -- 18:01:52 - (apputils.c:23) <Debug> (apputils_decode_idx) -- 19644 21791 21791 19644 pts/1    21791 S+    1000   0:00 ./sguard
+
+[21797] 16/8/2016 -- 18:02:30 - (apputils.c:23) <Debug> (apputils_decode_idx) -- 19644 21797 21797 19644 pts/1    21797 S+    1000   0:00 ./sguard
+

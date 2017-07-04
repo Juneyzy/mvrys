@@ -1,0 +1,11 @@
+%YAML 1.1
+---
+vpm:
+  version: 4.03.BUILDSTR
+  config-path: /usr/local/etc/vpm/
+  set-config-path: 0
+  executives:
+  - exec: 1
+    cmd: vpm
+    status: daemon,keepalive
+...

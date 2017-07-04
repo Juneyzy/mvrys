@@ -1,0 +1,22 @@
+%YAML 1.1
+---
+
+logging:
+  default-log-dir: ./logs
+  default-log-format: "[%i] %t - (%f:%l) <%d> (%n) -- "
+  # Log level, little case, vlaue in: EMERG,ALERT,CRIT,ERR,WARNING,NOTICE,INFO,DEBUG
+  default-log-level: info
+  # Define your logging outputs.  If none are defined, or they are all
+  # disabled you will get the default - console output.
+  outputs:
+  - console:
+      enable: yes
+  - file:
+      enable: yes
+      filename: xruntime_log
+  - syslog:
+      enable: no
+      facility: local5
+      format: "[%i] <%d> -- "
+
+...
